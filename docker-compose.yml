@@ -1,0 +1,29 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama-api-server
+    ports:
+      - "11434:11434"
+    volumes:
+      - /Users/ahmetyasinaytar/Desktop/models:/root/.ollama/models
+    restart: unless-stopped
+    networks:
+      - ollama-network
+
+  fastapi-wrapper:
+    build: .
+    container_name: fastapi-wrapper
+    ports:
+      - "8000:8000"
+    depends_on:
+      - ollama
+    restart: unless-stopped
+    networks:
+      - ollama-network
+    environment:
+      - OLLAMA_HOST=ollama
+      - OLLAMA_PORT=11434
+
+networks:
+  ollama-network:
+    driver: bridge
